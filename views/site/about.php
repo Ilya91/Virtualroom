@@ -11,6 +11,10 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
+        <?php
+        Yii::$app->redis->set('mykey', 'some value');
+        echo Yii::$app->redis->get('mykey');
+        ?>
         This is the About page. You may modify the following file to customize its content:
     </p>
 
