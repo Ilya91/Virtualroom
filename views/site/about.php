@@ -12,10 +12,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?php
-        Yii::$app->redis->set('mykey', 'some value');
-        echo Yii::$app->redis->get('mykey');
+        $redis = Yii::$app->redis;
+        $redis->sadd("global:classroom:users", "hell");
+
+        $data = $redis->smembers('global:classroom:users');
+        var_dump($data);
         ?>
-        This is the About page. You may modify the following file to customize its content:
     </p>
 
     <code><?= __FILE__ ?></code>
