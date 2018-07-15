@@ -12,13 +12,15 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?php
+        $obj = (object)['name' => 'Born', 'handState' => 0];
         $redis = Yii::$app->redis;
-        $redis->sadd("global:classroom:users", "hell");
+        $redis->sadd('global:classroom:users', 'userID:'. rand() . ':' .  serialize($obj));
 
-        $data = $redis->smembers('global:classroom:users');
-        var_dump($data);
+        $data = $redis->smembers("global:classroom:users");
+        foreach ($data as $datum) {
+            var_dump($datum);
+        }
+
         ?>
     </p>
-
-    <code><?= __FILE__ ?></code>
 </div>
