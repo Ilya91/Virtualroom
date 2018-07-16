@@ -5,11 +5,10 @@
 use yii\helpers\Html;
 use app\models\User;
 
-$this->title = 'About';
+$this->title = 'Members';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-about">
-    <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
         <?php
@@ -20,8 +19,8 @@ $this->params['breadcrumbs'][] = $this->title;
         //$data = $redis->smembers("global:classroom:users");
 
         $user = new User();
-        $data = $user->getUser('mykey');
-        var_dump($data);
+        $data = $user->getUser(Yii::$app->session['id']);
+        var_dump(unserialize($data));
         ?>
     </p>
 </div>

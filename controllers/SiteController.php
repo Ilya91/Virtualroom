@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\User;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -9,9 +10,20 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\RedisHelper;
 
 class SiteController extends Controller
 {
+
+    private $redisHelper;
+
+    public function __construct( $id, $module, RedisHelper $helper, array $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->redisHelper = $helper;
+    }
+
+
     /**
      * {@inheritdoc}
      */
@@ -71,19 +83,28 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
+        $form = new LoginForm();
+        $user = new User();
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
 
-        $model = new LoginForm();
         $data = Yii::$app->request->post('LoginForm');
-        var_dump($data);
+        if ($data){
+            $id = rand();
+            $key = 'global:classroom:users:' . $id;
+            $obj = (object)['name' => $data['name'], 'handState' => 0];
+            $user->setUser($key, serialize($obj));
+            $this->redisHelper->setUpdateTs();
+            Yii::$app->session['id'] = $id;
+            return $this->redirect(['site/members']);
+        }
         /*if ($model->load(Yii::$app->request->post()) && $model->login()) {
             return $this->goBack();
         }*/
 
         return $this->render('login', [
-            'model' => $model,
+            'model' => $form,
         ]);
     }
 
@@ -125,5 +146,10 @@ class SiteController extends Controller
     public function actionAbout()
     {
         return $this->render('about');
+    }
+
+    public function actionMembers()
+    {
+        return $this->render('members');
     }
 }

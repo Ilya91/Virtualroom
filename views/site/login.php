@@ -21,7 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]); ?>
 
-    <?= $form->field($model, 'username')->textInput()->label('Your name') ?>
+    <?= $form->field($model, 'name')->textInput()->label('Your name') ?>
 
     <div class="form-group">
         <div class="col-lg-offset-1 col-lg-11">
