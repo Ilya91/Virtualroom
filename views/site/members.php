@@ -21,6 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
         $user = new User();
         $data = $user->getUser(Yii::$app->session['id']);
         var_dump(unserialize($data));
+        var_dump(Yii::$app->session['id']);
         ?>
     </p>
 </div>

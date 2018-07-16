@@ -25,14 +25,7 @@ $config = [
             'port' => 6379,
             'database' => 0,
         ],
-        'session' => [
-            'class' => 'yii\redis\Session',
-            'redis' => [
-                'hostname' => 'localhost',
-                'port' => 6379,
-                'database' => 0,
-            ]
-        ],
+        'session' => $params['session_redis'],
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,

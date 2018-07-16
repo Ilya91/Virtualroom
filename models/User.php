@@ -22,4 +22,9 @@ class User extends Cache
     {
         return $this->setValue($key, $value, 0);
     }
+
+    public function deleteUser($id)
+    {
+        return $this->deleteValue('global:classroom:users:' . $id);
+    }
 }

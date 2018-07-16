@@ -14,6 +14,8 @@ use yii\base\Model;
 class LoginForm extends Model
 {
     public $name;
+
+    private $_user = false;
     /**
      * @return array the validation rules.
      */
@@ -23,5 +25,27 @@ class LoginForm extends Model
             // username and password are both required
             [['name'], 'required'],
         ];
+    }
+
+    /**
+     * Logs in a user using the provided username and password.
+     * @return bool whether the user is logged in successfully
+     */
+    public function login()
+    {
+        if ($this->validate()) {
+            return Yii::$app->user->login($this->getUser(), 3600*24*30);
+        }
+        return false;
+    }
+
+
+    public function getUser()
+    {
+        if ($this->_user === false) {
+            $this->_user = $this->name;
+        }
+
+        return $this->_user;
     }
 }
