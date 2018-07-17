@@ -10,7 +10,7 @@ return [
             'port'     => 6379,
             'database' => 0,
         ],
-        'keyPrefix'  => 'virtualroom:session:',
+        'keyPrefix'  => 'global:classroom:session:',
         'timeout'    => 3600 * 24,
         'useCookies' => true,
     ],

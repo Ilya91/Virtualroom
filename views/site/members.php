@@ -9,19 +9,22 @@ $this->title = 'Members';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-about">
-
     <p>
         <?php
-        $obj = (object)['name' => 'Born', 'handState' => 0];
-        $redis = Yii::$app->redis;
-        //$redis->sadd('global:classroom:users', 'userID:'. rand() . ':' .  serialize($obj));
-
-        //$data = $redis->smembers("global:classroom:users");
-
-        $user = new User();
-        $data = $user->getUser(Yii::$app->session['id']);
-        var_dump(unserialize($data));
-        var_dump(Yii::$app->session['id']);
+            $redis = Yii::$app->redis;
+            $members = $model->getUsersAsArray();
+            var_dump(Yii::$app->session['id']);
+            var_dump(Yii::$app->session['user']);
         ?>
     </p>
+        <div class="col-sm-12 col-md-8 col-md-offset-2">
+            <div class="list-group">
+                <a href="#" class="list-group-item disabled">
+                    Class Members
+                </a>
+                <?php foreach ( $members as $member) :?>
+                    <a href="#" class="list-group-item"><?= $member->name;?> <i class="glyphicon <?= $member->handState ? "glyphicon-hand-up" : "";?> pull-right"></i></a>
+                <?php endforeach;?>
+            </div>
+    </div>
 </div>

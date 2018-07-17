@@ -2,29 +2,61 @@
 
 namespace app\models;
 
+use Yii;
 use yii\redis\Cache;
 
 /**
  * Class User
  * @package app\models
  */
-class User extends Cache
+class User
 {
     public $name;
-    public $handState;
+    public $handState = 0;
+    public $redis;
 
-    public function getUser($id)
+    public function __construct()
     {
-        return $this->getValue('global:classroom:users:' . $id);
+        $this->redis = Yii::$app->redis;
     }
 
-    public function setUser($key, $value)
+    public function getAllUsersInSet()
     {
-        return $this->setValue($key, $value, 0);
+        return $this->redis->smembers('global:classroom:users');
     }
 
-    public function deleteUser($id)
+    public function getUsersAsArray()
     {
-        return $this->deleteValue('global:classroom:users:' . $id);
+        $members = $this->getAllUsersInSet();
+        $array = [];
+
+        foreach ($members as $member) {
+            $array[] = unserialize(substr(stristr($member, ':'), 1));
+        }
+
+        return $array;
+    }
+
+    public function deleteUserFromSet($id, $obj)
+    {
+        $this->redis->srem('global:classroom:users', $id . ':' .  serialize($obj));
+    }
+
+    public function addUserToSet($id, $obj)
+    {
+        $this->redis->sadd('global:classroom:users', $id . ':' .  serialize($obj));
+    }
+
+    public function addUser($id, $obj)
+    {
+        $this->redis->sadd('global:classroom:users:' . $id,  serialize($obj));
+    }
+
+    public function getUserById($id)
+    {
+        if ($id){
+
+        }
+        return false;
     }
 }

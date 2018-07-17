@@ -4,66 +4,22 @@ namespace app\controllers;
 
 use app\models\User;
 use Yii;
-use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
-use yii\filters\VerbFilter;
 use app\models\LoginForm;
-use app\models\ContactForm;
 use app\models\RedisHelper;
 
 class SiteController extends Controller
 {
 
     private $redisHelper;
+    private $user;
 
-    public function __construct( $id, $module, RedisHelper $helper, array $config = [])
+    public function __construct( $id, $module, RedisHelper $helper, User $user, array $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->redisHelper = $helper;
-    }
-
-
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'only' => ['logout'],
-                'rules' => [
-                    [
-                        'actions' => ['logout'],
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'logout' => ['post'],
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function actions()
-    {
-        return [
-            'error' => [
-                'class' => 'yii\web\ErrorAction',
-            ],
-            'captcha' => [
-                'class' => 'yii\captcha\CaptchaAction',
-                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
-            ],
-        ];
+        $this->user = $user;
     }
 
     /**
@@ -83,28 +39,19 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
-        session_unset();
-        session_destroy();
         $form = new LoginForm();
-        $user = new User();
-        $user->deleteUser(Yii::$app->session['id']);
-        if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
-
         $data = Yii::$app->request->post('LoginForm');
         if ($data){
             $id = rand();
-            $key = 'global:classroom:users:' . $id;
             $obj = (object)['name' => $data['name'], 'handState' => 0];
-            $user->setUser($key, serialize($obj));
+            $this->user->addUserToSet($id, $obj);
+            //$user->addUser($id, $user);
             $this->redisHelper->setUpdateTs();
             Yii::$app->session['id'] = $id;
+            Yii::$app->session['name'] = $data['name'];
+            Yii::$app->session['user'] = $obj;
             return $this->redirect(['site/members']);
         }
-        /*if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
-        }*/
 
         return $this->render('login', [
             'model' => $form,
@@ -118,12 +65,19 @@ class SiteController extends Controller
      */
     public function actionLogout()
     {
-        /*session_unset();
-        session_destroy();*/
+        $this->user->deleteUserFromSet(Yii::$app->session['id'],  Yii::$app->session['user']);
+        $this->redisHelper->setUpdateTs();
+        Yii::$app->session->destroy();
+        return $this->redirect(['site/login']);
     }
 
     public function actionMembers()
     {
-        return $this->render('members');
+        if (!Yii::$app->session['id']){
+            return $this->redirect(['site/login']);
+        }
+        return $this->render('members', [
+            'model' => $this->user,
+        ]);
     }
 }

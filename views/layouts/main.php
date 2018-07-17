@@ -44,7 +44,7 @@ AppAsset::register($this);
             empty(Yii::$app->session['id']) ? (
                 ['label' => 'Login', 'url' => ['/site/login']]
             ) : (
-            ['label' => 'Logout', 'url' => ['/site/logout']]
+            ['label' => 'Logout ( ' . Yii::$app->session['name'] . ' )', 'url' => ['/site/logout']]
             )
         ],
     ]);

@@ -12,24 +12,17 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
 <div class="row">
-    <?php $form = ActiveForm::begin([
-        'id' => 'login-form',
-        'layout' => 'horizontal',
-        'fieldConfig' => [
-            'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
-            'labelOptions' => ['class' => 'col-lg-1 control-label'],
-        ],
-    ]); ?>
+    <div class="absolute-center is-responsive">
+        <div class="col-sm-12 col-md-10 col-md-offset-1">
+            <?php $form = ActiveForm::begin([
+            ]); ?>
+            <label for="loginform-name">Your Name</label>
+            <?= $form->field($model, 'name')->textInput()->label(false) ?>
 
-    <?= $form->field($model, 'name')->textInput()->label('Your name') ?>
+            <?= Html::submitButton('Login', ['class' => 'btn btn-primary btn-block', 'name' => 'login-button']) ?>
 
-    <div class="form-group">
-        <div class="col-lg-offset-1 col-lg-11">
-            <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+            <?php ActiveForm::end(); ?>
         </div>
     </div>
-
-    <?php ActiveForm::end(); ?>
 </div>
-
 </div>

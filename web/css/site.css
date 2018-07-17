@@ -113,3 +113,27 @@ a.desc:after {
 .nav > li > form > button.logout:focus {
     outline: none;
 }
+.center-block {
+    float: none !important
+}
+#login-form{
+    width: 20%;
+}
+
+div.well{
+    height: 250px;
+}
+
+.absolute-center {
+    margin: auto;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+}
+
+.absolute-center.is-responsive {
+    width: 50%;
+    height: 50%;
+    min-width: 200px;
+    max-width: 400px;
+    padding: 40px;
+}
