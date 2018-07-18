@@ -44,6 +44,12 @@ class SiteController extends Controller
         if ($data){
             $id = rand();
             $obj = (object)['name' => $data['name'], 'handState' => 0];
+
+            if ($this->user->isUserExist($data['name'])){
+                \Yii::$app->session->setFlash('danger', 'User with such name is already exists!');
+                return $this->refresh();
+            }
+
             $this->user->addUserToSet($id, $obj);
             //$user->addUser($id, $user);
             $this->redisHelper->setUpdateTs();

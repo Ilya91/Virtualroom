@@ -25,6 +25,18 @@ class User
         return $this->redis->smembers('global:classroom:users');
     }
 
+    public function isUserExist($name)
+    {
+        $users = $this->getUsersAsArray();
+
+        foreach ($users as $user) {
+            if ($user->name === $name){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function getUsersAsArray()
     {
         $members = $this->getAllUsersInSet();
