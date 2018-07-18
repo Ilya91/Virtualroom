@@ -19,9 +19,11 @@
         "yiisoft/yii2-bootstrap": "*",
         "yiisoft/yii2-swiftmailer": "*",
         "yiisoft/yii2-redis": "^2.0",
-        "cboden/ratchet": "^0.4.1",
-        "react/event-loop": "~0.4",
-        "predis/predis-async": "dev-master"
+        "cboden/ratchet": "0.2.*",
+        "react/event-loop": "0.3.*",
+        "predis/predis-async": "^0.2.3",
+        "npm-asset/autobahn": "^18.3",
+        "npm-asset/requirejs": "^2.3"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "*",
