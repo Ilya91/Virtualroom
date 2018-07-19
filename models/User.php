@@ -61,14 +61,32 @@ class User
 
     public function addUser($id, $obj)
     {
-        $this->redis->sadd('global:classroom:users:' . $id,  serialize($obj));
+        $this->redis->set('global:classroom:users:' . $id,  serialize($obj));
+    }
+
+    public function updateUser($id, $obj)
+    {
+        $this->redis->set('global:classroom:users:' . $id,  serialize($obj));
     }
 
     public function getUserById($id)
     {
         if ($id){
-
+            return $this->redis->get('global:classroom:users:' . $id);
         }
+        return false;
+    }
+
+    public function getUserInSetById($id)
+    {
+        $members = $this->getAllUsersInSet();
+
+        foreach ($members as $member) {
+            if ($id == stristr($member, ':', true)){
+                return unserialize(substr(stristr($member, ':'), 1));
+            }
+        }
+
         return false;
     }
 }

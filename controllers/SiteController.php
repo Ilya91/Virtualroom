@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\PredisHelper;
 use app\models\User;
 use Yii;
 use yii\web\Controller;
@@ -14,12 +15,14 @@ class SiteController extends Controller
 
     private $redisHelper;
     private $user;
+    private $predisHelper;
 
-    public function __construct( $id, $module, RedisHelper $helper, User $user, array $config = [])
+    public function __construct( $id, $module, RedisHelper $helper, User $user, PredisHelper $predisHelper, array $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->redisHelper = $helper;
         $this->user = $user;
+        $this->predisHelper = $predisHelper;
     }
 
     /**
@@ -50,8 +53,8 @@ class SiteController extends Controller
                 return $this->refresh();
             }
 
+            $this->user->addUser($id, $obj);
             $this->user->addUserToSet($id, $obj);
-            //$user->addUser($id, $user);
             $this->redisHelper->setUpdateTs();
             Yii::$app->session['id'] = $id;
             Yii::$app->session['name'] = $data['name'];
@@ -85,5 +88,35 @@ class SiteController extends Controller
         return $this->render('members', [
             'model' => $this->user,
         ]);
+    }
+
+    public function actionRaise()
+    {
+        $raise = \Yii::$app->request->bodyParams['data'];
+
+        $sessid = Yii::$app->session['id'];
+        if ($raise && $user = $this->user->getUserInSetById($sessid)){
+            /*$user = unserialize($this->user->getUserById($sessid));
+
+            if ($user->handState === 0){
+                $user->handState = 1;
+            }else{
+                $user->handState = 0;
+            }
+            $this->user->updateUser($sessid, $user);*/
+
+            $this->user->deleteUserFromSet($sessid, $user);
+
+            if ($user->handState === 0){
+                $user->handState = 1;
+            }else{
+                $user->handState = 0;
+            }
+
+            $this->user->addUserToSet($sessid, $user);
+            $this->redisHelper->setUpdateTs();
+
+            $this->predisHelper->publish('channel:jmoz', "data");
+        }
     }
 }

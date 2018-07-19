@@ -16,13 +16,13 @@ use yii\web\View;
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
-class AutoAsset extends AssetBundle
+class MemberAsset extends AssetBundle
 {
     public $basePath = '@webroot';
     public $baseUrl = '@web';
 
     public $js = [
-        'js/autobahn.min.js'
+        'js/Members.js'
     ];
     public $jsOptions = [
         'position' => View::POS_END

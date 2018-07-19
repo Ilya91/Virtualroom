@@ -10,7 +10,7 @@ class Pusher implements WampServerInterface {
     /**
      * A lookup of all the topics clients have subscribed to
      */
-    public $subscribedTopics = array();
+    public $subscribedTopics = ['channel:jmoz'];
     protected $redis;
     public function init($client) {
         $this->redis = $client;
@@ -30,7 +30,7 @@ class Pusher implements WampServerInterface {
     /**
      * @param string
      */
-    public function pubsub($event, $pubsub) {
+    public function pubSub($event, $pubsub) {
         echo "Pusher: pubsub\n";
         echo "Pusher: kind: $event->kind channel: $event->channel payload: $event->payload\n";
         if (!array_key_exists($event->channel, $this->subscribedTopics)) {
