@@ -10,9 +10,9 @@
 
         //var socket = new WebSocket("ws://virtualroom:8081/classroom");
 
-        var ws = new Wampy('ws://localhost:8081/classroom');
+        /*var ws = new Wampy('ws://localhost:8081/classroom');
 
-        console.log(ws);
+        console.log(ws);*/
 
         this.$raiseHand.on("click", function (event) {
 

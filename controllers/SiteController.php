@@ -119,4 +119,10 @@ class SiteController extends Controller
             $this->predisHelper->publish('classroom', "raise_up");
         }
     }
+
+    public function actionPubsub()
+    {
+        $result = \Yii::$app->request->post();
+        $this->predisHelper->publish($result['channel'], $result['pub']);
+    }
 }

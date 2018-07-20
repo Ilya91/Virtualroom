@@ -4,7 +4,7 @@ var channels = [];
 var defaultChannels = ['channel:jmoz'];
 $(function() {
 // connect to WAMP server
-    ab.connect("ws://{{ ws_domain }}:{{ ws_port }}",
+    ab.connect("ws://localhost:8080",
         // WAMP session was established
         function (session) {
             // things to do once the session has been established
@@ -50,7 +50,7 @@ $(function() {
         sess.publish(channel, message);
     }
     redis_publish = function(message) {
-        $.post('{{ path("pubsub") }}', {"pub": message, "channel":get_channel()}, function (data) {
+        $.post('/site/pubsub', {"pub": message, "channel":get_channel()}, function (data) {
             console.log("pubsub: ajax response: " + data);
         });
     }
