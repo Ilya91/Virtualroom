@@ -10,7 +10,7 @@ class Pusher implements WampServerInterface {
     /**
      * A lookup of all the topics clients have subscribed to
      */
-    public $subscribedTopics = ['channel:jmoz'];
+    public $subscribedTopics = ['classroom'];
     protected $redis;
     public function init($client) {
         $this->redis = $client;
@@ -23,7 +23,7 @@ class Pusher implements WampServerInterface {
         // When a visitor subscribes to a topic link the Topic object in a  lookup array
         if (!array_key_exists($topic->getId(), $this->subscribedTopics)) {
             $this->subscribedTopics[$topic->getId()] = $topic;
-            $pubsubContext = $this->redis->pubsub($topic->getId(), array($this, 'pubsub'));
+            $pubsubContext = $this->redis->pubSub($topic->getId(), array($this, 'pubsub'));
             echo "Pusher: subscribed to topic $topic\n";
         }
     }
@@ -51,6 +51,7 @@ class Pusher implements WampServerInterface {
         echo "Pusher: topic: $topic {$topic->count()}\n";
     }
     public function onOpen(ConnectionInterface $conn) {
+        var_dump($conn);
         echo "Pusher: onOpen\n";
     }
     public function onClose(ConnectionInterface $conn) {

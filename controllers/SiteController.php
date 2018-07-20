@@ -116,7 +116,7 @@ class SiteController extends Controller
             $this->user->addUserToSet($sessid, $user);
             $this->redisHelper->setUpdateTs();
 
-            $this->predisHelper->publish('channel:jmoz', "data");
+            $this->predisHelper->publish('classroom', "raise_up");
         }
     }
 }

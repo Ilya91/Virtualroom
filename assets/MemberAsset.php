@@ -22,7 +22,8 @@ class MemberAsset extends AssetBundle
     public $baseUrl = '@web';
 
     public $js = [
-        'js/Members.js'
+        'js/Members.js',
+        'js/wampy.min.js'
     ];
     public $jsOptions = [
         'position' => View::POS_END

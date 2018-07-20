@@ -8,17 +8,21 @@
 
     Members.prototype.addEventListener = function () {
 
-        //var socket = new WebSocket("ws://127.0.0.1:8081");
+        //var socket = new WebSocket("ws://virtualroom:8081/classroom");
 
+        var ws = new Wampy('ws://localhost:8081/classroom');
+
+        console.log(ws);
 
         this.$raiseHand.on("click", function (event) {
 
-            /*socket.onopen = function() {
-                console.log("cоединение установлено");
-            };
-            socket.onmessage = function(event) {
-                console.log(event);
-            };*/
+            /*socket.send(JSON.stringify({"command": "subscribe","identifier":"{\"channel\":\"classroom\"}"}));
+
+            socket.onmessage = function(msg) {
+                console.log(JSON.parse(msg.data).message);
+            }*/
+
+
             event.preventDefault();
             $.ajax({
                 url: 'site/raise',
