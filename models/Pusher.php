@@ -10,7 +10,7 @@ class Pusher implements WampServerInterface {
     /**
      * A lookup of all the topics clients have subscribed to
      */
-    public $subscribedTopics = ['classroom'];
+    public $subscribedTopics = ['global:classroom:users:*', 'global:classroom:*'];
     protected $redis;
     public function init($client) {
         $this->redis = $client;
@@ -39,7 +39,7 @@ class Pusher implements WampServerInterface {
         }
         $topic = $this->subscribedTopics[$event->channel];
         echo "Pusher: $event->channel: $event->payload {$topic->count()}\n";
-        $topic->broadcast("$event->channel: $event->payload");
+        $topic->broadcast("$event->payload");
         // quit if we get the message from redis
         if (strtolower(trim($event->payload)) === 'quit') {
             echo "Pusher: quitting...\n";
@@ -51,7 +51,6 @@ class Pusher implements WampServerInterface {
         echo "Pusher: topic: $topic {$topic->count()}\n";
     }
     public function onOpen(ConnectionInterface $conn) {
-        var_dump($conn);
         echo "Pusher: onOpen\n";
     }
     public function onClose(ConnectionInterface $conn) {
@@ -65,7 +64,7 @@ class Pusher implements WampServerInterface {
     public function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible) {
         // In this application if clients send data it's because the user hacked around in console
         echo "Pusher: onPublish\n";
-        $topic->broadcast("$topic: $event");
+        $topic->broadcast("$event");
     }
     public function onError(ConnectionInterface $conn, \Exception $e) {
         echo "Pusher: onError\n";

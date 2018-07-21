@@ -1,16 +1,16 @@
 var sess;
 var KEY_RETURN = 13;
 var channels = [];
-var defaultChannels = ['channel:jmoz'];
+var defaultChannels = ['global:classroom:*'];
 $(function() {
 // connect to WAMP server
     ab.connect("ws://localhost:8080",
         // WAMP session was established
         function (session) {
             // things to do once the session has been established
-            console.log("ab: session connected")
-            sess = session
-            on_connect()
+            console.log("ab: session connected");
+            sess = session;
+            on_connect();
         },
         // WAMP session is gone
         function (code, reason) {
@@ -32,7 +32,7 @@ $(function() {
             return false;
         }
         sess.subscribe(chan, function (channel, event) {
-            console.log("ab: channel: " + channel + " event: " + event);
+            $("a[data-key='" + event +"']").find('i').toggleClass('glyphicon-hand-up');
             add_response(event);
             notify("Message: " + event, 'info');
         });
@@ -50,7 +50,7 @@ $(function() {
         sess.publish(channel, message);
     }
     redis_publish = function(message) {
-        $.post('/site/pubsub', {"pub": message, "channel":get_channel()}, function (data) {
+        $.post('/site/pubsub', {"raise": message, "channel":get_channel()}, function (data) {
             console.log("pubsub: ajax response: " + data);
         });
     }
@@ -85,6 +85,8 @@ $(function() {
         $('#response').val(function (i, val) {
             return text + "\n" + val;
         });
+
+        //$("a.list-group-item").data("key");
     }
 // publish to connected websockets
     $('#pub').keypress(function (e) {
@@ -107,11 +109,8 @@ $(function() {
         unsubscribe(channel)
     });
 // publish via ajax on server side
-    $('#redispub').keypress(function (e) {
-        if (e.which == KEY_RETURN) {
-            redis_publish(this.value);
-            $(this).val('');
-        }
+    $('#raise_hand').click(function (e) {
+        redis_publish(true);
     });
 
 });

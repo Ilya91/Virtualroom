@@ -30,11 +30,12 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php
             $redis = Yii::$app->redis;
             $members = $model->getUsersAsArray();
-            var_dump(Yii::$app->session['id']);
-            var_dump(Yii::$app->session['user']);
+
+            /*var_dump(Yii::$app->session['id']);
+            var_dump($members);*/
 
             $users = $model->getUserInSetById(Yii::$app->session['id']);
-            var_dump($users);
+            var_dump($redis->keys('global:classroom:users*'));
         ?>
     </p>
         <div class="col-sm-12 col-md-8 col-md-offset-2">
@@ -43,7 +44,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     Class Members
                 </a>
                 <?php foreach ( $members as $member) :?>
-                    <a href="#" class="list-group-item"><?= $member->name;?> <i class="glyphicon <?= $member->handState ? "glyphicon-hand-up" : "";?> pull-right"></i></a>
+                    <a href="#" class="list-group-item" data-key="<?= $member->id;?>"><?= $member->name;?> <i class="glyphicon <?= $member->handState ? "glyphicon-hand-up" : "";?> pull-right"></i></a>
                 <?php endforeach;?>
             </div>
 

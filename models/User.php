@@ -11,6 +11,7 @@ use yii\redis\Cache;
  */
 class User
 {
+    public $id;
     public $name;
     public $handState = 0;
     public $redis;
@@ -40,12 +41,12 @@ class User
     public function getUsersAsArray()
     {
         $members = $this->getAllUsersInSet();
+
         $array = [];
 
         foreach ($members as $member) {
             $array[] = unserialize(substr(stristr($member, ':'), 1));
         }
-
         return $array;
     }
 

@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\PredisHelper;
 use app\models\User;
+use stdClass;
 use Yii;
 use yii\web\Controller;
 use yii\web\Response;
@@ -46,7 +47,10 @@ class SiteController extends Controller
         $data = Yii::$app->request->post('LoginForm');
         if ($data){
             $id = rand();
-            $obj = (object)['name' => $data['name'], 'handState' => 0];
+            $obj = new stdClass;
+            $obj->id = $id;
+            $obj->name = $data['name'];
+            $obj->handState = 0;
 
             if ($this->user->isUserExist($data['name'])){
                 \Yii::$app->session->setFlash('danger', 'User with such name is already exists!');
@@ -76,6 +80,7 @@ class SiteController extends Controller
     {
         $this->user->deleteUserFromSet(Yii::$app->session['id'],  Yii::$app->session['user']);
         $this->redisHelper->setUpdateTs();
+        //$this->predisHelper->publish('__keyspace@1__:global:classroom:*', 'update');
         Yii::$app->session->destroy();
         return $this->redirect(['site/login']);
     }
@@ -105,7 +110,7 @@ class SiteController extends Controller
             }
             $this->user->updateUser($sessid, $user);*/
 
-            $this->user->deleteUserFromSet($sessid, $user);
+            //$this->user->deleteUserFromSet($sessid, $user);
 
             if ($user->handState === 0){
                 $user->handState = 1;
@@ -113,16 +118,16 @@ class SiteController extends Controller
                 $user->handState = 0;
             }
 
-            $this->user->addUserToSet($sessid, $user);
+            //$this->user->addUserToSet($sessid, $user);
             $this->redisHelper->setUpdateTs();
 
-            $this->predisHelper->publish('classroom', "raise_up");
+            //$this->predisHelper->publish('classroom', "raise_up");
         }
     }
 
     public function actionPubsub()
     {
         $result = \Yii::$app->request->post();
-        $this->predisHelper->publish($result['channel'], $result['pub']);
+        $this->predisHelper->publish($result['channel'], Yii::$app->session['id']);
     }
 }
