@@ -4,7 +4,7 @@ var channels = [];
 var defaultChannels = ['global:classroom:*'];
 $(function() {
 // connect to WAMP server
-    ab.connect("ws://localhost:8080",
+    ab.connect("ws://localhost:8085",
         // WAMP session was established
         function (session) {
             // things to do once the session has been established
@@ -32,6 +32,9 @@ $(function() {
             return false;
         }
         sess.subscribe(chan, function (channel, event) {
+            console.log(event);
+            var obj = jQuery.parseJSON(event);
+            console.log(obj.members);
             $("a[data-key='" + event +"']").find('i').toggleClass('glyphicon-hand-up');
             add_response(event);
             notify("Message: " + event, 'info');

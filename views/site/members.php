@@ -35,7 +35,8 @@ $this->params['breadcrumbs'][] = $this->title;
             var_dump($members);*/
 
             $users = $model->getUserInSetById(Yii::$app->session['id']);
-            var_dump($redis->keys('global:classroom:users*'));
+            $all = $model->getAllUsers();
+            //var_dump($model->getAllUsers());
         ?>
     </p>
         <div class="col-sm-12 col-md-8 col-md-offset-2">

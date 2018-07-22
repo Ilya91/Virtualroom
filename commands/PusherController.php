@@ -23,7 +23,7 @@ class PusherController extends Controller
         $client->connect(array($pusher, 'init'));
 // Set up our WebSocket server for clients wanting real-time updates
         $webSock = new Server($loop);
-        $webSock->listen(8080, '127.0.0.1');
+        $webSock->listen(8085, '127.0.0.1');
         $webServer = new IoServer(
             new WsServer(
                 new WampServer(

@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\Json;
 use yii\redis\Cache;
 
 /**
@@ -89,5 +90,17 @@ class User
         }
 
         return false;
+    }
+
+    public function getAllUsers()
+    {
+        $keys = $this->redis->keys('global:classroom:users:*');
+        $users = [];
+        foreach ($keys as $key) {
+            $a = $this->redis->get($key);
+            var_dump($a);
+            $users[] = unserialize($this->redis->get($key));
+        }
+        return $users;
     }
 }

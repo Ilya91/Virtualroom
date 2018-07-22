@@ -15,4 +15,6 @@ class RedisHelper extends Cache
     {
         return $this->setValue('global:classroom:updateTs', time(), 0);
     }
+
+
 }

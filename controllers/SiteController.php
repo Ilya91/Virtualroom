@@ -60,6 +60,7 @@ class SiteController extends Controller
             $this->user->addUser($id, $obj);
             $this->user->addUserToSet($id, $obj);
             $this->redisHelper->setUpdateTs();
+            $this->predisHelper->publish('global:classroom:*', 'class_config_changed');
             Yii::$app->session['id'] = $id;
             Yii::$app->session['name'] = $data['name'];
             Yii::$app->session['user'] = $obj;

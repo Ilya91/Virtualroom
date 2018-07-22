@@ -4,13 +4,15 @@ namespace app\models;
 
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
+use Yii;
+use yii\helpers\Json;
 
 
 class Pusher implements WampServerInterface {
     /**
      * A lookup of all the topics clients have subscribed to
      */
-    public $subscribedTopics = ['global:classroom:users:*', 'global:classroom:*'];
+    public $subscribedTopics = ['global:classroom:users:*', 'global:classroom:*', 'global:classroom:updateTs'];
     protected $redis;
     public function init($client) {
         $this->redis = $client;
@@ -23,6 +25,7 @@ class Pusher implements WampServerInterface {
         // When a visitor subscribes to a topic link the Topic object in a  lookup array
         if (!array_key_exists($topic->getId(), $this->subscribedTopics)) {
             $this->subscribedTopics[$topic->getId()] = $topic;
+            var_dump($topic);
             $pubsubContext = $this->redis->pubSub($topic->getId(), array($this, 'pubsub'));
             echo "Pusher: subscribed to topic $topic\n";
         }
@@ -39,7 +42,19 @@ class Pusher implements WampServerInterface {
         }
         $topic = $this->subscribedTopics[$event->channel];
         echo "Pusher: $event->channel: $event->payload {$topic->count()}\n";
-        $topic->broadcast("$event->payload");
+
+        $model = new User();
+        if ($event->payload == 'class_config_changed'){
+            $members = $model->getAllUsers();
+            $response = [
+                'type' => 'class_config_changed',
+                'members' => $members
+            ];
+            $response = Json::encode($response);
+            $topic->broadcast($response);
+        }
+
+        //$topic->broadcast("$event->payload");
         // quit if we get the message from redis
         if (strtolower(trim($event->payload)) === 'quit') {
             echo "Pusher: quitting...\n";
