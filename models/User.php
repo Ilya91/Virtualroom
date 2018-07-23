@@ -29,7 +29,7 @@ class User
 
     public function isUserExist($name)
     {
-        $users = $this->getUsersAsArray();
+        $users = $this->getAllUsers();
 
         foreach ($users as $user) {
             if ($user->name === $name){
@@ -74,7 +74,15 @@ class User
     public function getUserById($id)
     {
         if ($id){
-            return $this->redis->get('global:classroom:users:' . $id);
+            return unserialize($this->redis->get('global:classroom:users:' . $id));
+        }
+        return false;
+    }
+
+    public function getUserByKey($key)
+    {
+        if ($key){
+            return unserialize($this->redis->get($key));
         }
         return false;
     }
@@ -97,10 +105,13 @@ class User
         $keys = $this->redis->keys('global:classroom:users:*');
         $users = [];
         foreach ($keys as $key) {
-            $a = $this->redis->get($key);
-            var_dump($a);
             $users[] = unserialize($this->redis->get($key));
         }
         return $users;
+    }
+
+    public function deleteUser($id)
+    {
+        $this->redis->del('global:classroom:users:' . $id);
     }
 }

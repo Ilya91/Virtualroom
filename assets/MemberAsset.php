@@ -22,9 +22,9 @@ class MemberAsset extends AssetBundle
     public $baseUrl = '@web';
 
     public $js = [
-        'js/Members.js',
         'js/autobahn.min.js',
-        'js/script.js'
+        'js/script.js',
+        'js/Members.js',
     ];
     public $jsOptions = [
         'position' => View::POS_END

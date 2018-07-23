@@ -58,7 +58,6 @@ class SiteController extends Controller
             }
 
             $this->user->addUser($id, $obj);
-            $this->user->addUserToSet($id, $obj);
             $this->redisHelper->setUpdateTs();
             $this->predisHelper->publish('global:classroom:*', 'class_config_changed');
             Yii::$app->session['id'] = $id;
@@ -79,9 +78,9 @@ class SiteController extends Controller
      */
     public function actionLogout()
     {
-        $this->user->deleteUserFromSet(Yii::$app->session['id'],  Yii::$app->session['user']);
+        $this->user->deleteUser(Yii::$app->session['id']);
         $this->redisHelper->setUpdateTs();
-        //$this->predisHelper->publish('__keyspace@1__:global:classroom:*', 'update');
+        $this->predisHelper->publish('global:classroom:*', 'class_config_changed');
         Yii::$app->session->destroy();
         return $this->redirect(['site/login']);
     }
@@ -91,6 +90,7 @@ class SiteController extends Controller
         if (!Yii::$app->session['id']){
             return $this->redirect(['site/login']);
         }
+        $this->predisHelper->publish('global:classroom:*', 'class_config_changed');
         return $this->render('members', [
             'model' => $this->user,
         ]);
@@ -98,20 +98,11 @@ class SiteController extends Controller
 
     public function actionRaise()
     {
-        $raise = \Yii::$app->request->bodyParams['data'];
+        $result = \Yii::$app->request->post('raise');
 
         $sessid = Yii::$app->session['id'];
-        if ($raise && $user = $this->user->getUserInSetById($sessid)){
-            /*$user = unserialize($this->user->getUserById($sessid));
 
-            if ($user->handState === 0){
-                $user->handState = 1;
-            }else{
-                $user->handState = 0;
-            }
-            $this->user->updateUser($sessid, $user);*/
-
-            //$this->user->deleteUserFromSet($sessid, $user);
+        if ($result && $user = $this->user->getUserById($sessid)){
 
             if ($user->handState === 0){
                 $user->handState = 1;
@@ -119,16 +110,10 @@ class SiteController extends Controller
                 $user->handState = 0;
             }
 
-            //$this->user->addUserToSet($sessid, $user);
+            $this->user->updateUser($sessid, $user);
             $this->redisHelper->setUpdateTs();
 
-            //$this->predisHelper->publish('classroom', "raise_up");
+            $this->predisHelper->publish('global:classroom:users:*' , 'student_state_changed-' . $sessid);
         }
-    }
-
-    public function actionPubsub()
-    {
-        $result = \Yii::$app->request->post();
-        $this->predisHelper->publish($result['channel'], Yii::$app->session['id']);
     }
 }

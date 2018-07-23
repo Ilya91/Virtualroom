@@ -25,7 +25,6 @@ class Pusher implements WampServerInterface {
         // When a visitor subscribes to a topic link the Topic object in a  lookup array
         if (!array_key_exists($topic->getId(), $this->subscribedTopics)) {
             $this->subscribedTopics[$topic->getId()] = $topic;
-            var_dump($topic);
             $pubsubContext = $this->redis->pubSub($topic->getId(), array($this, 'pubsub'));
             echo "Pusher: subscribed to topic $topic\n";
         }
@@ -52,9 +51,17 @@ class Pusher implements WampServerInterface {
             ];
             $response = Json::encode($response);
             $topic->broadcast($response);
+        }elseif (strpos($event->payload, 'student_state_changed') === 0){
+            $payload = explode('-', $event->payload);
+            $student = $model->getUserByKey('global:classroom:users:' . $payload[1]);
+            $response = [
+                'type' => 'student_state_changed',
+                'student' => $student
+            ];
+            $response = Json::encode($response);
+            $topic->broadcast($response);
         }
 
-        //$topic->broadcast("$event->payload");
         // quit if we get the message from redis
         if (strtolower(trim($event->payload)) === 'quit') {
             echo "Pusher: quitting...\n";

@@ -29,73 +29,23 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
         <?php
             $redis = Yii::$app->redis;
-            $members = $model->getUsersAsArray();
+            $members = $model->getAllUsers();
 
-            /*var_dump(Yii::$app->session['id']);
-            var_dump($members);*/
-
-            $users = $model->getUserInSetById(Yii::$app->session['id']);
-            $all = $model->getAllUsers();
-            //var_dump($model->getAllUsers());
+            $user = new User();
+            $users = $user->getUserById(Yii::$app->session['id']);
         ?>
     </p>
         <div class="col-sm-12 col-md-8 col-md-offset-2">
+            <p id="notify">&nbsp;</p>
             <div class="list-group">
                 <a href="#" class="list-group-item disabled">
                     Class Members
                 </a>
-                <?php foreach ( $members as $member) :?>
-                    <a href="#" class="list-group-item" data-key="<?= $member->id;?>"><?= $member->name;?> <i class="glyphicon <?= $member->handState ? "glyphicon-hand-up" : "";?> pull-right"></i></a>
-                <?php endforeach;?>
+                <div class="list-members">
+                    <?php foreach ( $members as $member) :?>
+                        <a href="#" class="list-group-item" data-key="<?= $member->id;?>"><?= $member->name;?> <i class="glyphicon <?= $member->handState ? "glyphicon-hand-up" : "";?> pull-right"></i></a>
+                    <?php endforeach;?>
+                </div>
             </div>
-
-
-
-
-            <h3>Notifications:</h3>
-
-            <p id="notify">&nbsp;</p>
-
-            <h3>Operations:</h3>
-
-            <form class="form-horizontal">
-                <div class="control-group">
-                    <label class="control-label" for="channels">Active channel:</label>
-                    <div class="controls">
-                        <select class="channels"></select>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="unsub"></label>
-                    <div class="controls">
-                        <button class="btn btn-danger" type="button" id="unsub">Unsubscribe</button>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="sub">Subscribe:</label>
-                    <div class="controls">
-                        <input type="text" id="sub" placeholder="">
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="pub">Publish (websocket):</label>
-                    <div class="controls">
-                        <input type="text" id="pub" placeholder="">
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="redispub">Publish (server Redis):</label>
-                    <div class="controls">
-                        <input type="text" id="redispub" placeholder="">
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="response"><strong>Response:</strong></label>
-                    <div class="controls">
-                        <textarea id="response" rows="10"></textarea>
-                    </div>
-                </div>
-            </form>
-
         </div>
 </div>

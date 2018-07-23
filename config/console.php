@@ -31,6 +31,7 @@ $config = [
             'port' => 6379,
             'database' => 0,
         ],
+        'session' => $params['session_redis'],
     ],
     'params' => $params,
     /*
