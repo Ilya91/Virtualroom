@@ -17,7 +17,11 @@ class Pusher implements WampServerInterface {
     public function init($client) {
         $this->redis = $client;
         echo "Connected to Redis, now listening for incoming messages...\n";
+        //$this->redis->pubSub('__keyspace@0__:global:classroom:*', [$this, 'pubSub']);
 
+        $client->psubscribe('__keyspace@0__:global:classroom:*', function ($event){
+            var_dump($event);
+        });
     }
     public function onSubscribe(ConnectionInterface $conn, $topic) {
         echo "Pusher: onSubscribe\n";
@@ -25,7 +29,7 @@ class Pusher implements WampServerInterface {
         // When a visitor subscribes to a topic link the Topic object in a  lookup array
         if (!array_key_exists($topic->getId(), $this->subscribedTopics)) {
             $this->subscribedTopics[$topic->getId()] = $topic;
-            $pubsubContext = $this->redis->pubSub($topic->getId(), array($this, 'pubsub'));
+            $pubsubContext = $this->redis->pubSub($topic->getId(), array($this, 'pubSub'));
             echo "Pusher: subscribed to topic $topic\n";
         }
     }
@@ -41,7 +45,6 @@ class Pusher implements WampServerInterface {
         }
         $topic = $this->subscribedTopics[$event->channel];
         echo "Pusher: $event->channel: $event->payload {$topic->count()}\n";
-
         $model = new User();
         if ($event->payload == 'class_config_changed'){
             $members = $model->getAllUsers();
