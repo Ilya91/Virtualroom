@@ -12,7 +12,7 @@ class Pusher implements WampServerInterface {
     /**
      * A lookup of all the topics clients have subscribed to
      */
-    public $subscribedTopics = ['global:classroom:users:*', 'global:classroom:*', 'global:classroom:updateTs'];
+    public $subscribedTopics = ['__keyspace@0__:global:classroom:*', 'global:classroom:users:*', 'global:classroom:*'];
     protected $redis;
     public function init($client) {
         $this->redis = $client;

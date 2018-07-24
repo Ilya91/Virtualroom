@@ -11,6 +11,10 @@ use yii\web\Response;
 use app\models\LoginForm;
 use app\models\RedisHelper;
 
+/**
+ * Class SiteController - main controller
+ * @package app\controllers
+ */
 class SiteController extends Controller
 {
 
@@ -18,7 +22,16 @@ class SiteController extends Controller
     private $user;
     private $predisHelper;
 
-    public function __construct( $id, $module, RedisHelper $helper, User $user, PredisHelper $predisHelper, array $config = [])
+    /**
+     * SiteController constructor.
+     * @param $id
+     * @param $module
+     * @param RedisHelper $helper
+     * @param User $user
+     * @param PredisHelper $predisHelper
+     * @param array $config
+     */
+    public function __construct($id, $module, RedisHelper $helper, User $user, PredisHelper $predisHelper, array $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->redisHelper = $helper;
@@ -85,6 +98,9 @@ class SiteController extends Controller
         return $this->redirect(['site/login']);
     }
 
+    /**
+     * @return string|Response
+     */
     public function actionMembers()
     {
         if (!Yii::$app->session['id']){
@@ -96,6 +112,9 @@ class SiteController extends Controller
         ]);
     }
 
+    /**
+     * Get ajax request, get user by sessid, change handState, save to Redis, publish student_state_changed
+     */
     public function actionRaise()
     {
         $result = \Yii::$app->request->post('raise');

@@ -4,7 +4,6 @@
 
 use yii\helpers\Html;
 use app\models\User;
-use yii\widgets\Pjax;
 use app\assets\MemberAsset;
 
 MemberAsset::register($this);
@@ -36,7 +35,6 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
     </p>
         <div class="col-sm-12 col-md-8 col-md-offset-2">
-            <p id="notify">&nbsp;</p>
             <div class="list-group">
                 <a href="#" class="list-group-item disabled">
                     Class Members

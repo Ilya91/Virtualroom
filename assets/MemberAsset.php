@@ -23,7 +23,6 @@ class MemberAsset extends AssetBundle
 
     public $js = [
         'js/autobahn.min.js',
-        'js/script.js',
         'js/Members.js',
     ];
     public $jsOptions = [

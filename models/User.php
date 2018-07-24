@@ -3,8 +3,6 @@
 namespace app\models;
 
 use Yii;
-use yii\helpers\Json;
-use yii\redis\Cache;
 
 /**
  * Class User
