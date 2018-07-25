@@ -41,14 +41,19 @@ class Pusher implements WampServerInterface {
                     ];
                     $response = Json::encode($response);
                     $topic->broadcast($response);
-                }elseif (strpos($event[2], '__keyspace@0__:global:classroom:users:') === 0){
-                    $student = $model->getUserByKey('global:classroom:users:' . substr($event[2], strlen('__keyspace@0__:global:classroom:users:')));
-                    $response = [
-                        'type' => 'student_state_changed',
-                        'student' => $student
-                    ];
-                    $response = Json::encode($response);
-                    $topic->broadcast($response);
+
+                }else {
+                    foreach ($event as $item) {
+                        if (strlen($item) > 40){
+                            $student = $model->getUserByKey('global:classroom:users:' . substr($item, strlen('__keyspace@0__:global:classroom:users:')));
+                            $response = [
+                                'type' => 'student_state_changed',
+                                'student' => $student
+                            ];
+                            $response = Json::encode($response);
+                            $topic->broadcast($response);
+                        }
+                    }
                 }
             }
         });
