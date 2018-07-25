@@ -1,3 +1,6 @@
+<h3>1. Install Yii app with all libraries via composer</h3>
+<h3>2. In redis.conf set KEA for notify-keyspace-events</h3>
+<h3>3. run in terminal: php yii pusher</h3>
 <p align="center">
     <a href="https://github.com/yiisoft" target="_blank">
         <img src="https://avatars0.githubusercontent.com/u/993323" height="100px">
