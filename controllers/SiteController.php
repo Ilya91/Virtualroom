@@ -72,7 +72,6 @@ class SiteController extends Controller
 
             $this->user->addUser($id, $obj);
             $this->redisHelper->setUpdateTs();
-            $this->predisHelper->publish('global:classroom:*', 'class_config_changed');
             Yii::$app->session['id'] = $id;
             Yii::$app->session['name'] = $data['name'];
             Yii::$app->session['user'] = $obj;
@@ -93,8 +92,8 @@ class SiteController extends Controller
     {
         $this->user->deleteUser(Yii::$app->session['id']);
         $this->redisHelper->setUpdateTs();
-        $this->predisHelper->publish('global:classroom:*', 'class_config_changed');
         Yii::$app->session->destroy();
+
         return $this->redirect(['site/login']);
     }
 
@@ -106,14 +105,16 @@ class SiteController extends Controller
         if (!Yii::$app->session['id']){
             return $this->redirect(['site/login']);
         }
-        $this->predisHelper->publish('global:classroom:*', 'class_config_changed');
+
+        $members = $this->user->getAllUsers();
+
         return $this->render('members', [
-            'model' => $this->user,
+            'members' => $members,
         ]);
     }
 
     /**
-     * Get ajax request, get user by sessid, change handState, save to Redis, publish student_state_changed
+     * Get ajax request, get user by sessid, change handState, save to Redis
      */
     public function actionRaise()
     {
@@ -130,9 +131,6 @@ class SiteController extends Controller
             }
 
             $this->user->updateUser($sessid, $user);
-            $this->redisHelper->setUpdateTs();
-
-            $this->predisHelper->publish('global:classroom:users:*' , 'student_state_changed-' . $sessid);
         }
     }
 }

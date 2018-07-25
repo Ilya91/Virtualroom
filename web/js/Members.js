@@ -9,7 +9,7 @@
     Members.prototype.addEventListener = function () {
 
         var sess;
-        var defaultChannels = ['__keyspace@0__:global:classroom:*', 'global:classroom:*', 'global:classroom:users:*'];
+        var defaultChannels = ['__keyspace@0__:global:classroom:*'];
 
         ab.connect("ws://localhost:8080",
             // WAMP session was established

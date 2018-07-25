@@ -4,6 +4,7 @@ namespace app\models;
 
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
+use SplObjectStorage;
 use Yii;
 use yii\helpers\Json;
 
@@ -12,58 +13,58 @@ class Pusher implements WampServerInterface {
     /**
      * A lookup of all the topics clients have subscribed to
      */
-    public $subscribedTopics = ['__keyspace@0__:global:classroom:*', 'global:classroom:users:*', 'global:classroom:*'];
+    public $subscribedTopics = ['__keyspace@0__:global:classroom:*'];
     protected $redis;
+    protected $clients;
+
+    public function __construct() {
+        $this->clients = new SplObjectStorage;
+    }
     public function init($client) {
         $this->redis = $client;
         echo "Connected to Redis, now listening for incoming messages...\n";
-        //$this->redis->pubSub('__keyspace@0__:global:classroom:*', [$this, 'pubSub']);
-
-        $client->psubscribe('__keyspace@0__:global:classroom:*', function ($event){
-            var_dump($event);
-        });
     }
+
+
     public function onSubscribe(ConnectionInterface $conn, $topic) {
         echo "Pusher: onSubscribe\n";
         echo "Pusher: topic: $topic {$topic->count()}\n";
-        // When a visitor subscribes to a topic link the Topic object in a  lookup array
-        if (!array_key_exists($topic->getId(), $this->subscribedTopics)) {
-            $this->subscribedTopics[$topic->getId()] = $topic;
-            $pubsubContext = $this->redis->pubSub($topic->getId(), array($this, 'pubSub'));
-            echo "Pusher: subscribed to topic $topic\n";
-        }
+
+        $this->redis->psubscribe('__keyspace@0__:global:classroom:*', function ($event) use ($topic){
+            if (in_array("set", $event)){
+                $model = new User();
+                if (in_array('__keyspace@0__:global:classroom:updateTs', $event)){
+                    $members = $model->getAllUsers();
+                    $response = [
+                        'type' => 'class_config_changed',
+                        'members' => $members
+                    ];
+                    $response = Json::encode($response);
+                    $topic->broadcast($response);
+                }elseif (strpos($event[2], '__keyspace@0__:global:classroom:users:') === 0){
+                    $student = $model->getUserByKey('global:classroom:users:' . substr($event[2], strlen('__keyspace@0__:global:classroom:users:')));
+                    $response = [
+                        'type' => 'student_state_changed',
+                        'student' => $student
+                    ];
+                    $response = Json::encode($response);
+                    $topic->broadcast($response);
+                }
+            }
+        });
     }
     /**
      * @param string
      */
-    public function pubSub($event, $pubsub) {
+    public function pubsub($event, $pubsub) {
         echo "Pusher: pubsub\n";
         echo "Pusher: kind: $event->kind channel: $event->channel payload: $event->payload\n";
         if (!array_key_exists($event->channel, $this->subscribedTopics)) {
-            echo "Pusher: no subscribers, no broadcast\n";
+            //echo "Pusher: no subscribers, no broadcast\n";
             return;
         }
         $topic = $this->subscribedTopics[$event->channel];
         echo "Pusher: $event->channel: $event->payload {$topic->count()}\n";
-        $model = new User();
-        if ($event->payload == 'class_config_changed'){
-            $members = $model->getAllUsers();
-            $response = [
-                'type' => 'class_config_changed',
-                'members' => $members
-            ];
-            $response = Json::encode($response);
-            $topic->broadcast($response);
-        }elseif (strpos($event->payload, 'student_state_changed') === 0){
-            $payload = explode('-', $event->payload);
-            $student = $model->getUserByKey('global:classroom:users:' . $payload[1]);
-            $response = [
-                'type' => 'student_state_changed',
-                'student' => $student
-            ];
-            $response = Json::encode($response);
-            $topic->broadcast($response);
-        }
 
         // quit if we get the message from redis
         if (strtolower(trim($event->payload)) === 'quit') {
@@ -77,6 +78,9 @@ class Pusher implements WampServerInterface {
     }
     public function onOpen(ConnectionInterface $conn) {
         echo "Pusher: onOpen\n";
+        $this->clients->attach($conn);
+
+        echo "New connection! ({$conn->resourceId})\n";
     }
     public function onClose(ConnectionInterface $conn) {
         echo "Pusher: onClose\n";

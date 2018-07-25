@@ -3,7 +3,6 @@
 /* @var $this yii\web\View */
 
 use yii\helpers\Html;
-use app\models\User;
 use app\assets\MemberAsset;
 
 MemberAsset::register($this);
@@ -25,15 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]) ?>
         </div>
     </div>
-    <p>
-        <?php
-            $redis = Yii::$app->redis;
-            $members = $model->getAllUsers();
-
-            $user = new User();
-            $users = $user->getUserById(Yii::$app->session['id']);
-        ?>
-    </p>
+    <div class="row">
         <div class="col-sm-12 col-md-8 col-md-offset-2">
             <div class="list-group">
                 <a href="#" class="list-group-item disabled">
@@ -46,4 +37,5 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
             </div>
         </div>
+    </div>
 </div>

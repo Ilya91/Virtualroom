@@ -10,7 +10,7 @@ return [
             'port'     => 6379,
             'database' => 0,
         ],
-        'keyPrefix'  => 'global:classroom:session:',
+        'keyPrefix'  => 'global:session:',
         'timeout'    => 3600 * 24,
         'useCookies' => true,
     ],
