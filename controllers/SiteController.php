@@ -6,6 +6,7 @@ use app\models\PredisHelper;
 use app\models\User;
 use stdClass;
 use Yii;
+use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\Response;
 use app\models\LoginForm;
@@ -59,22 +60,21 @@ class SiteController extends Controller
         $form = new LoginForm();
         $data = Yii::$app->request->post('LoginForm');
         if ($data){
-            $id = rand();
-            $obj = new stdClass;
-            $obj->id = $id;
-            $obj->name = $data['name'];
-            $obj->handState = 0;
 
             if ($this->user->isUserExist($data['name'])){
                 \Yii::$app->session->setFlash('danger', 'User with such name is already exists!');
                 return $this->refresh();
             }
+            $id = rand();
+            $this->user->addUser($id, Json::encode([
+                'id' => $id,
+                'name' => $data['name'],
+                'handState' => 0,
+            ]));
 
-            $this->user->addUser($id, $obj);
             $this->redisHelper->setUpdateTs();
             Yii::$app->session['id'] = $id;
             Yii::$app->session['name'] = $data['name'];
-            Yii::$app->session['user'] = $obj;
             return $this->redirect(['site/members']);
         }
 
@@ -124,10 +124,10 @@ class SiteController extends Controller
 
         if ($result && $user = $this->user->getUserById($sessid)){
 
-            if ($user->handState === 0){
-                $user->handState = 1;
+            if ($user['handState'] === 0){
+                $user['handState'] = 1;
             }else{
-                $user->handState = 0;
+                $user['handState'] = 0;
             }
 
             $this->user->updateUser($sessid, $user);

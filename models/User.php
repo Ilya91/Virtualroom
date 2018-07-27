@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\Json;
 
 /**
  * Class User
@@ -30,7 +31,7 @@ class User
         $users = $this->getAllUsers();
 
         foreach ($users as $user) {
-            if ($user->name === $name){
+            if ($user['name'] === $name){
                 return true;
             }
         }
@@ -59,20 +60,20 @@ class User
         $this->redis->sadd('global:classroom:users', $id . ':' .  serialize($obj));
     }
 
-    public function addUser($id, $obj)
+    public function addUser($id, $user)
     {
-        $this->redis->set('global:classroom:users:' . $id,  serialize($obj));
+        $this->redis->set('global:classroom:users:' . $id,  $user);
     }
 
-    public function updateUser($id, $obj)
+    public function updateUser($id, $user)
     {
-        $this->redis->set('global:classroom:users:' . $id,  serialize($obj));
+        $this->redis->set('global:classroom:users:' . $id,  Json::encode($user));
     }
 
     public function getUserById($id)
     {
         if ($id){
-            return unserialize($this->redis->get('global:classroom:users:' . $id));
+            return Json::decode($this->redis->get('global:classroom:users:' . $id));
         }
         return false;
     }
@@ -80,7 +81,7 @@ class User
     public function getUserByKey($key)
     {
         if ($key){
-            return unserialize($this->redis->get($key));
+            return Json::decode($this->redis->get($key));
         }
         return false;
     }
@@ -103,7 +104,7 @@ class User
         $keys = $this->redis->keys('global:classroom:users:*');
         $users = [];
         foreach ($keys as $key) {
-            $users[] = unserialize($this->redis->get($key));
+            $users[] = Json::decode($this->redis->get($key));
         }
         return $users;
     }
